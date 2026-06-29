@@ -435,7 +435,7 @@ async function submitForm() {
 
         buoi1:
             lopHoc.value === "12"
-            ? getSelected("nhom12")
+            ? getSelected("nhomHoc")
             : getSelected("buoi1"),
 
         buoi2:

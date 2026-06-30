@@ -53,8 +53,8 @@ const CLASS_LIMITS = {
     Lop10B: 30,
     Lop11A: 40,
     Lop11B: 30,
-    Lop12A: 5,
-    Lop12B: 5,
+    Lop12A: 0,
+    Lop12B: 0,
     Lop12C: 20
 };
 let classCounts = {};

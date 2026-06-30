@@ -58,6 +58,7 @@ const CLASS_LIMITS = {
     Lop12C: 20
 };
 let classCounts = {};
+let countsLoaded = false;
 
 hoTen.addEventListener("input", validateForm);
 sdtPhuHuynh.addEventListener("input", validateForm);
@@ -72,47 +73,73 @@ async function loadCounts() {
         const response =
             await fetch(WEB_APP_URL);
 
+        if (!response.ok) {
+            throw new Error(
+                `HTTP ${response.status}`
+            );
+        }
+
         const result =
             await response.json();
 
         if (result.success) {
 
-            classCounts =
-                result.counts || {};
+            classCounts = result.counts || {};
+            countsLoaded = true;
+
+            // Nếu người dùng đã chọn lớp rồi
+            if (lopHoc.value) {
+                buildForm();
+            }
         }
 
     } catch (err) {
 
         console.error(err);
+
+        message.className = "error";
+        message.textContent =
+            "Không tải được dữ liệu lớp học.";
     }
 }
 
 window.addEventListener(
     "load",
-    async () => {
-
-        await loadCounts();
+    () => {
 
         lopHoc.addEventListener(
             "change",
             buildForm
         );
+
+        loadCounts();
     }
 );
 
 function buildForm() {
+
+    if (!countsLoaded) {
+
+    message.className = "loading";
+    message.textContent =
+        "Đang tải dữ liệu lớp học...";
+
+    return;
+    }
 
     const lop = lopHoc.value;
 
     if (!lop) {
 
         formSection.style.display = "none";
+        message.style.display = "None"
         submitBtn.disabled = true;
 
         return;
     }
 
     formSection.style.display = "block";
+    message.style.display = "block"
 
     message.innerHTML = "";
 
@@ -121,6 +148,26 @@ function buildForm() {
 
     if (lop === "8") {
 
+        const sheetName = "Lop8"
+        const current = classCounts[sheetName] || 0;
+        const limit = CLASS_LIMITS[sheetName];
+        
+        if (current >= limit) {
+
+            formSection.style.display = "none";
+
+            message.className = "error";
+            message.innerHTML =
+                `Lớp đã đầy.`;
+
+            submitBtn.disabled = true;
+
+            return;
+        }    
+
+        formSection.style.display = "block";
+        submitBtn.disabled = false;
+    
         lienHeHocSinh.value = "";
         sdtHocSinh.value = "";
 
@@ -131,10 +178,35 @@ function buildForm() {
 
         scheduleImage.src = "images/lop8.jpg";
 
+        message.className = "success";
+        message.textContent =
+            `Lớp còn ${limit - current} chỗ`;
+        
     }
+
 
     if (lop === "9") {
 
+        const sheetName = "Lop9"
+        const current = classCounts[sheetName] || 0;
+        const limit = CLASS_LIMITS[sheetName];
+        
+        if (current >= limit) {
+
+            formSection.style.display = "none";
+
+            message.className = "error";
+            message.innerHTML =
+                `Lớp đã đầy.`;
+
+            submitBtn.disabled = true;
+
+            return;
+        }    
+
+        formSection.style.display = "block";
+        submitBtn.disabled = false;
+    
         lienHeHocSinh.value = "";
         sdtHocSinh.value = "";
 
@@ -145,6 +217,10 @@ function buildForm() {
 
         scheduleImage.src = "images/lop9.jpg";
 
+        message.className = "success";
+        message.textContent =
+            `Lớp còn ${limit - current} chỗ`;
+        
     }
 
     if (lop === "10") {
@@ -369,14 +445,10 @@ function createClassCards(groups) {
                     ${group}
                 </div>
 
-                <div>
-                    ${current}/${limit}
-                </div>
-
                 ${
                     full
                     ? '<div class="full">Lớp đã đầy</div>'
-                    : ''
+                    : `<div>Còn ${limit - current} chỗ</div>`
                 }
 
             </div>

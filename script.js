@@ -110,8 +110,8 @@ function buildForm() {
 
         scheduleImage.src = "images/lop10.jpg";
 
-        groupTitle.textContent = "Chọn nhóm học (có thể học chéo giữa các nhóm)";
-        createGroupTable_3([
+        groupTitle.textContent = "Chọn nhóm học";
+        createClassCards([
             "10A",
             "10B"
         ]);
@@ -126,8 +126,8 @@ function buildForm() {
         loadSchools(THPT);
 
         scheduleImage.src = "images/lop11.jpg";
-        groupTitle.textContent = "Chọn nhóm học (có thể học chéo giữa các nhóm)";
-        createGroupTable_3([
+        groupTitle.textContent = "Chọn nhóm học";
+        createClassCards([
             "11A",
             "11B"
         ]);
@@ -171,6 +171,7 @@ function loadSchools(list) {
 }
 
 function createGroupTable_3(groups) {
+    // Hàm tạo bảng chọn chéo lớp có 3 buổi
 
     groupSection.style.display = "block";
 
@@ -224,6 +225,7 @@ function createGroupTable_3(groups) {
 }
 
 function createGroupTable_2(groups) {
+    // Hàm tạo bảng chéo nhóm có 2 buổi
 
     groupSection.style.display = "block";
 
@@ -362,6 +364,8 @@ function validateForm() {
         }
     }
 
+/*
+// Kiểm tra xem đã chọn đủ số buổi của lớp 11 hoặc 10 chưa, nếu đã đủ => bật sáng nút đăng kí
     if (
         lopHoc.value === "11" ||
         lopHoc.value === "10"
@@ -378,8 +382,11 @@ function validateForm() {
                 ok = false;
         }
     }
+*/
 
-    if (lopHoc.value === "12") {
+    if (lopHoc.value === "12" ||
+        lopHoc.value === "11" ||
+        lopHoc.value === "10") {
 
         const selected =
             document.querySelector(
@@ -433,6 +440,9 @@ async function submitForm() {
         truongHoc:
             truongHoc.value,
 
+        nhom:
+            getSelected("nhomHoc"),
+/*
         buoi1:
             lopHoc.value === "12"
             ? getSelected("nhomHoc")
@@ -447,6 +457,7 @@ async function submitForm() {
             lopHoc.value === "12"
             ? ""
             : getSelected("buoi3"),
+*/
     };
 
     try {

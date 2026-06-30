@@ -46,13 +46,59 @@ const THPT = [
     "Trường khác"
 ];
 
-lopHoc.addEventListener("change", buildForm);
+const CLASS_LIMITS = {
+    Lop8: 20,
+    Lop9: 10,
+    Lop10A: 30,
+    Lop10B: 30,
+    Lop11A: 40,
+    Lop11B: 30,
+    Lop12A: 5,
+    Lop12B: 5,
+    Lop12C: 20
+};
+let classCounts = {};
 
 hoTen.addEventListener("input", validateForm);
 sdtPhuHuynh.addEventListener("input", validateForm);
 sdtHocSinh.addEventListener("input",validateForm);
 lienHeHocSinh.addEventListener("input", validateForm);
 truongHoc.addEventListener("change", validateForm);
+
+async function loadCounts() {
+
+    try {
+
+        const response =
+            await fetch(WEB_APP_URL);
+
+        const result =
+            await response.json();
+
+        if (result.success) {
+
+            classCounts =
+                result.counts || {};
+        }
+
+    } catch (err) {
+
+        console.error(err);
+    }
+}
+
+window.addEventListener(
+    "load",
+    async () => {
+
+        await loadCounts();
+
+        lopHoc.addEventListener(
+            "change",
+            buildForm
+        );
+    }
+);
 
 function buildForm() {
 
@@ -286,20 +332,61 @@ function createClassCards(groups) {
     const wrapper = document.createElement("div");
     wrapper.className = "class-selection";
 
+    const sheetMap = {
+
+        "10A": "Lop10A",
+        "10B": "Lop10B",
+
+        "11A": "Lop11A",
+        "11B": "Lop11B",
+
+        "12A": "Lop12A",
+        "12B": "Lop12B",
+        "12C": "Lop12C"
+    };
+
     groups.forEach(group => {
+
+        const sheetName =
+            sheetMap[group];
+
+        const current =
+            classCounts[sheetName] || 0;
+
+        const limit =
+            CLASS_LIMITS[sheetName];
+
+        const full =
+            current >= limit;
 
         const label = document.createElement("label");
         label.className = "class-card";
 
         label.innerHTML = `
             <div class="class-info">
-                <div class="class-title">${group}</div>
+
+                <div class="class-title">
+                    ${group}
+                </div>
+
+                <div>
+                    ${current}/${limit}
+                </div>
+
+                ${
+                    full
+                    ? '<div class="full">Lớp đã đầy</div>'
+                    : ''
+                }
+
             </div>
 
             <input
                 type="radio"
                 name="nhomHoc"
-                value="${group}">
+                value="${group}"
+                ${full ? "disabled" : ""}
+            >
         `;
 
         wrapper.appendChild(label);
@@ -316,7 +403,6 @@ function createClassCards(groups) {
                 validateForm
             );
         });
-
 }
 
 
